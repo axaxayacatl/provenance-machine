@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Provenance Machine — cryptographic artifact provenance anchored on Solana.">
+<title>PROVENANCE MACHINE</title>
+<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<main class="shell">
+<header class="top">
+  <div class="brand"><span class="mark">□ □<br>□　□</span><span>PROVENANCE MACHINE</span></div>
+  <div class="network">SOLANA / DEVNET</div>
+</header>
+<section class="hero">
+  <p class="eyebrow">CRYPTOGRAPHIC PROVENANCE SYSTEM</p>
+  <h1>REGISTER WHAT EXISTED.</h1>
+  <p class="lead">Hash digital artifacts locally. Anchor the commitment on Solana. Verify the exact artifact later without uploading the original file.</p>
+</section>
+<section class="panel">
+  <div class="panel-head"><span>01 / ARTIFACT</span><span id="fileState">NO FILE SELECTED</span></div>
+  <label class="drop" id="dropZone" for="fileInput">
+    <input id="fileInput" type="file" hidden>
+    <strong>SELECT FILE</strong><span>or drop an artifact here</span>
+  </label>
+  <div id="fileInfo" class="file-info hidden">
+    <div><span>NAME</span><b id="fileName">—</b></div>
+    <div><span>SIZE</span><b id="fileSize">—</b></div>
+    <div class="wide"><span>SHA-256</span><code id="fileHash">—</code></div>
+  </div>
+</section>
+<section class="panel">
+  <div class="panel-head"><span>02 / PROVENANCE</span><span id="walletState">WALLET OFFLINE</span></div>
+  <div class="grid">
+    <div><span>NETWORK</span><b>Solana Devnet</b></div>
+    <div><span>OWNER</span><code id="walletAddress">—</code></div>
+    <div><span>VERSION</span><input id="version" type="number" min="1" value="1"></div>
+    <div><span>STATUS</span><b id="status">READY</b></div>
+  </div>
+  <div class="actions"><button id="connectBtn">CONNECT WALLET</button><button id="anchorBtn" disabled>ANCHOR PROVENANCE</button></div>
+  <div id="txResult" class="result hidden"></div>
+</section>
+<section class="panel">
+  <div class="panel-head"><span>03 / VERIFY</span><span id="verifyState">NO RECORD LOADED</span></div>
+  <p class="small">Verification recalculates the selected file locally and compares it with the on-chain provenance record.</p>
+  <div class="actions"><button id="verifyBtn" disabled>VERIFY ARTIFACT</button></div>
+  <div id="verifyResult" class="verify-result">WAITING FOR ARTIFACT</div>
+</section>
+<footer><span>PROVENANCE MACHINE</span><span>DATA REMAINS LOCAL</span><span>ON-CHAIN COMMITMENT ONLY</span></footer>
+</main>
+<script src="https://unpkg.com/@solana/web3.js@1.98.4/lib/index.iife.min.js"></script>
+<script src="./app.js"></script>
+</body>
+</html>
