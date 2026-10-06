@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#080a10">
+<meta name="description" content="Provenance Machine is a digital asset provenance platform concept for fingerprinting, documenting, and verifying digital artifacts.">
+<title>Provenance Machine</title>
+<link rel="icon" href="https://raw.githubusercontent.com/axaxayacatl/provenance-machine/main/PROVENANCE_MACHINE_logo%281%29.png">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700;800&display=swap');
+
+:root {
+  color-scheme:dark;
+  --bg:#080a10;
+  --surface:#0e121c;
+  --surface2:#121927;
+  --line:#252e41;
+  --text:#f1f3fa;
+  --muted:#929db4;
+  --blue:#7087ff;
+  --purple:#a783ff;
+  --cyan:#58d9e9;
+  --green:#53dfb2;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:13px Inter,Arial,sans-serif}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
+a{color:inherit;text-decoration:none}
+code,.mono{font-family:"IBM Plex Mono",monospace;overflow-wrap:anywhere}
+.topbar{
+  min-height:83px;display:flex;align-items:center;justify-content:space-between;
+  gap:20px;padding:15px 27px;border-bottom:1px solid var(--line);
+  background:#0b0e17;position:sticky;top:0;z-index:5
+}
+.brand{display:flex;align-items:center;gap:13px;min-width:0}
+.brand img{width:43px;height:43px;object-fit:contain}
+.brand h1{font-size:20px;letter-spacing:-.8px;margin:0;font-weight:800}
+.brand p{font-size:11px;color:var(--muted);margin:6px 0 0}
+.header-right{display:flex;align-items:center;gap:14px}
+.environment{border:1px solid #493c78;background:#17132a;padding:9px 13px;border-radius:9px}
+.environment strong{font-size:10px;color:#c6b3ff;letter-spacing:1px}
+.environment p{font-size:10px;color:var(--muted);margin:5px 0 0}
+.layout{display:grid;grid-template-columns:218px minmax(0,1fr);min-height:calc(100vh - 83px)}
+.sidebar{background:#0a0d15;border-right:1px solid var(--line);padding:20px 13px;display:flex;flex-direction:column;gap:5px}
+.nav{border:1px solid transparent;background:transparent;color:#a6b2ca;border-radius:8px;text-align:left;padding:13px;display:flex;gap:11px;align-items:center}
+.nav:hover{background:#151b2b;color:white}
+.nav.active{background:#202651;border-color:#353e7a;color:white}
+.nav .icon{width:18px;text-align:center;font-size:16px}
+.side-bottom{margin-top:auto;padding:14px;border:1px solid var(--line);border-radius:9px;background:var(--surface);line-height:1.8;color:var(--muted);font-size:11px}
+.side-bottom img{width:24px;height:24px;object-fit:contain;vertical-align:middle;margin-right:6px}
+.side-bottom strong{color:var(--text)}
+main{min-width:0;width:100%;max-width:1650px;margin:0 auto;padding:25px}
+.view{display:none}
+.view.active{display:block;animation:enter .25s ease}
+@keyframes enter{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.hero{
+  display:flex;align-items:center;justify-content:space-between;gap:24px;
+  min-height:194px;padding:30px;border:1px solid #2b3d70;border-radius:12px;
+  background:radial-gradient(ellipse at 90% 50%,#1b2d61 0%,#101a37 35%,#0e1425 75%);
+  overflow:hidden;position:relative
+}
+.hero:after{content:"";position:absolute;width:280px;height:280px;right:-95px;top:-105px;border:1px solid #5369a633;border-radius:50%;box-shadow:0 0 0 32px #5369a610,0 0 0 65px #5369a608;pointer-events:none}
+.hero-copy{position:relative;z-index:1;max-width:670px}
+.eyebrow{font:10px "IBM Plex Mono",monospace;letter-spacing:2px;color:var(--cyan)}
+.hero h2{font-size:clamp(25px,3vw,36px);letter-spacing:-1.2px;margin:15px 0 11px}
+.hero p{color:#b1bfdc;line-height:1.9;margin:0;max-width:590px}
+.hero-mark{position:relative;z-index:1;flex-shrink:0;width:130px;height:130px;object-fit:contain;filter:drop-shadow(0 0 22px #687bff40)}
+.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:19px}
+.btn{border:1px solid #35425c;background:#151e30;color:var(--text);border-radius:7px;padding:10px 13px;transition:background .15s}
+.btn:hover{background:#253451}
+.btn.primary{background:linear-gradient(105deg,#526bff,#8059ed);border-color:transparent;color:white;font-weight:700}
+.btn.primary:hover{filter:brightness(1.12)}
+.btn.ghost{background:transparent}
+.btn.small{font-size:11px;padding:7px 10px}
+.btn.full{width:100%;margin-top:15px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.section-grid{display:grid;grid-template-columns:minmax(280px,1fr) minmax(280px,1fr) minmax(260px,.83fr);gap:15px;margin-top:16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:18px;min-width:0}
+.card-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:15px}
+h3{font-size:14px;letter-spacing:-.3px;margin:0}
+.muted{color:var(--muted)}
+.smalltext{font-size:11px;line-height:1.8}
+.label{display:block;font-size:11px;color:#b7c3dc;margin:15px 0 7px}
+input[type=text],textarea,select{width:100%;background:#090e19;color:var(--text);border:1px solid #29364e;border-radius:7px;padding:11px}
+textarea{min-height:74px;resize:vertical;line-height:1.7}
+input::placeholder,textarea::placeholder{color:#64718b}
+.dropzone{border:1px dashed #566ab4;background:#0b1222;border-radius:8px;padding:19px;text-align:center;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:9px;cursor:pointer;color:#b6c3e0;min-height:112px}
+.dropzone:hover,.dropzone.drag{border-color:var(--cyan);background:#101b32}
+.dropzone .up{font-size:25px;color:#a59aff}
+#fileInput{display:none}
+#chosenFile{font:10px "IBM Plex Mono",monospace;color:var(--cyan);overflow-wrap:anywhere}
+.pill{display:inline-block;border-radius:20px;padding:5px 8px;font-size:9px;letter-spacing:.6px;font-weight:700}
+.pill.purple{background:#2a2048;color:#cbb7ff}
+.pill.green{background:#10372f;color:var(--green)}
+.pill.blue{background:#1a2949;color:#a9bcff}
+.pill.gray{background:#242b38;color:#aeb9ce}
+.asset-list{display:flex;flex-direction:column;gap:9px}
+.asset{display:flex;align-items:center;gap:11px;padding:11px;border:1px solid #253149;border-radius:8px;cursor:pointer;min-width:0}
+.asset:hover,.asset.selected{border-color:#657cff;background:#141c32}
+.asset-icon{width:40px;height:40px;flex-shrink:0;display:grid;place-items:center;background:#20294b;border-radius:7px;color:#a9b6ff;font-size:20px}
+.asset-info{min-width:0;flex:1}
+.asset-info strong{display:block;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;font-size:11px}
+.asset-info small{display:block;color:var(--muted);font-size:10px;margin-top:6px}
+.asset-arrow{color:#8299ff}
+.empty{text-align:center;padding:22px 8px;color:var(--muted);line-height:1.9}
+.detail{padding:12px 0;border-bottom:1px solid var(--line)}
+.detail:last-child{border-bottom:0}
+.detail-label{font-size:10px;color:var(--muted);margin-bottom:7px}
+.detail-value{font-size:12px;line-height:1.7;overflow-wrap:anywhere}
+.hash{font:10px/1.8 "IBM Plex Mono",monospace;color:#a5b4ff;overflow-wrap:anywhere}
+.timeline{padding-left:20px;margin:18px 0 4px 5px;border-left:1px solid #35456b}
+.event{position:relative;padding-bottom:19px}
+.event:last-child{padding-bottom:0}
+.event:before{content:"";position:absolute;left:-25px;top:2px;width:8px;height:8px;border:2px solid #7087ff;border-radius:50%;background:#17264b}
+.event.future:before{border-color:#aa8bff;background:#2a1d4a}
+.event strong{font-size:11px}
+.event p{color:var(--muted);font-size:10px;line-height:1.8;margin:5px 0 0}
+.notice{border:1px solid #46396e;background:#151329;border-radius:8px;padding:12px;margin-top:15px;color:#b9b5dc;font-size:10px;line-height:1.8}
+.notice strong{color:#d2c4ff}
+.features{display:grid;grid-template-columns:repeat(4,1fr);margin-top:16px;background:var(--surface);border:1px solid var(--line);border-radius:10px}
+.feature{padding:17px 10px;text-align:center;border-right:1px solid var(--line)}
+.feature:last-child{border:0}
+.feature .symbol{font-size:20px;color:#aab7ff}
+.feature strong{display:block;margin:8px 0 5px;font-size:11px}
+.feature p{font-size:10px;line-height:1.7;color:var(--muted);margin:0}
+.subhero{padding:24px;border:1px solid var(--line);border-radius:10px;background:var(--surface);margin-bottom:16px}
+.subhero h2{font-size:24px;letter-spacing:-.7px;margin:10px 0}
+.subhero p{color:var(--muted);line-height:1.8;margin:0}
+.workflow{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px}
+.step{border:1px solid var(--line);border-radius:9px;background:var(--surface);padding:16px}
+.step .num{font:11px "IBM Plex Mono",monospace;color:var(--cyan)}
+.step strong{display:block;margin:12px 0 7px}
+.step p{font-size:11px;line-height:1.8;color:var(--muted);margin:0}
+.result{display:none;padding:14px;border:1px solid var(--line);border-radius:8px;line-height:1.8;margin-top:13px;overflow-wrap:anywhere}
+.result.show{display:block}
+.result.pass{background:#10271f;border-color:#27654e}
+.result.fail{background:#29171d;border-color:#79404c}
+footer{text-align:center;padding:26px 0 6px;color:#5e6b83;font:10px "IBM Plex Mono",monospace;letter-spacing:.7px}
+.toast{position:fixed;bottom:22px;left:50%;transform:translate(-50%,15px);opacity:0;pointer-events:none;background:#182239;border:1px solid #465d8c;border-radius:8px;padding:12px 17px;z-index:10;max-width:90vw;text-align:center;line-height:1.6;transition:.2s}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+@media(max-width:1250px){.section-grid{grid-template-columns:1fr 1fr}.detail-card{grid-column:1/-1}.detail-columns{display:grid;grid-template-columns:1fr 1fr;gap:20px}}
+@media(max-width:720px){
+ .topbar{padding:13px;gap:8px}.brand img{width:35px;height:35px}.brand h1{font-size:16px}.brand p{font-size:10px}
+ .environment{padding:8px}.environment p{font-size:9px}
+ .layout{grid-template-columns:1fr}.sidebar{flex-direction:row;overflow:auto;padding:8px;border-right:0;border-bottom:1px solid var(--line)}
+ .nav{white-space:nowrap;padding:10px;font-size:11px}.nav .icon{display:none}.side-bottom{display:none}
+ main{padding:13px}.hero{padding:21px;min-height:180px}.hero-mark{width:65px;height:65px}.hero h2{font-size:26px}
+ .section-grid{grid-template-columns:1fr}.detail-card{grid-column:auto}.detail-columns{display:block}
+ .features{grid-template-columns:1fr 1fr}.feature:nth-child(2){border-right:0}.feature:nth-child(-n+2){border-bottom:1px solid var(--line)}
+ .workflow{grid-template-columns:1fr 1fr}
+}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <a href="#" class="brand" aria-label="Provenance Machine home">
+    <img src="https://raw.githubusercontent.com/axaxayacatl/provenance-machine/main/PROVENANCE_MACHINE_logo%281%29.png" alt="Provenance Machine logo">
+    <div>
+      <h1>Provenance Machine</h1>
+      <p>Track · Verify · Build Trust</p>
+    </div>
+  </a>
+  <div class="header-right">
+    <div class="environment">
+      <strong>PRODUCT PROTOTYPE</strong>
+      <p>Network adapter not connected</p>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+<aside class="sidebar" aria-label="Product navigation">
+  <button class="nav active" data-view="overview"><span class="icon">⌂</span>Overview</button>
+  <button class="nav" data-view="register"><span class="icon">⊕</span>Register Artifact</button>
+  <button class="nav" data-view="records"><span class="icon">▤</span>Asset Registry</button>
+  <button class="nav" data-view="verify"><span class="icon">✓</span>Integrity Verification</button>
+  <button class="nav" data-view="architecture"><span class="icon">⌘</span>Architecture</button>
+  <div class="side-bottom">
+    <img src="https://raw.githubusercontent.com/axaxayacatl/provenance-machine/main/PROVENANCE_MACHINE_logo%281%29.png" alt="" loading="lazy">
+    <strong>Provenance infrastructure</strong>
+    <p>Designed to make digital artifacts easier to identify, document and verify.</p>
+    <a href="https://github.com/axaxayacatl/provenance-machine" target="_blank" rel="noopener noreferrer">⌁ Source repository ↗</a>
+  </div>
+</aside>
+
+<main>
+<section class="view active" id="view-overview">
+  <div class="hero">
+    <div class="hero-copy">
+      <div class="eyebrow">DIGITAL ASSET PROVENANCE / PRODUCT 001</div>
+      <h2>Make the record part of the artifact.</h2>
+      <p>Provenance Machine is a proposed infrastructure layer for registering digital artifacts, generating cryptographic fingerprints and establishing verifiable records of origin and change.</p>
+      <div class="actions">
+        <button class="btn primary" data-go="register">Register an artifact ↗</button>
+        <button class="btn" data-go="architecture">Explore architecture</button>
+      </div>
+    </div>
+    <img class="hero-mark" src="https://raw.githubusercontent.com/axaxayacatl/provenance-machine/main/PROVENANCE_MACHINE_logo%281%29.png" alt="Provenance Machine">
+  </div>
+
+  <div class="section-grid">
+    <section class="card" id="quick-register">
+      <div class="card-head">
+        <h3>Register an artifact</h3>
+        <span class="pill blue">LOCAL PROCESSING</span>
+      </div>
+      <p class="muted smalltext">Create a record for a file or digital object. Its SHA-256 fingerprint is calculated in your browser.</p>
+      <form id="assetForm">
+        <label class="dropzone" id="dropzone" for="fileInput">
+          <span class="up">⇧</span>
+          <strong id="dropTitle">Select or drop a file</strong>
+          <span class="smalltext">The file is not uploaded.</span>
+          <span id="chosenFile">No file selected</span>
+        </label>
+        <input id="fileInput" type="file">
+        <label class="label" for="assetName">Artifact name</label>
+        <input id="assetName" type="text" maxlength="120" placeholder="e.g. Research Dataset 001" required>
+        <label class="label" for="assetType">Artifact category</label>
+        <select id="assetType">
+          <option>Digital file</option>
+          <option>Research artifact</option>
+          <option>Dataset</option>
+          <option>Software release</option>
+          <option>Media asset</option>
+          <option>Physical object record</option>
+          <option>Other</option>
+        </select>
+        <label class="label" for="assetDescription">Description</label>
+        <textarea id="assetDescription" maxlength="1000" placeholder="Origin, version, creator attribution or context"></textarea>
+        <button class="btn primary full" id="createButton" type="submit">Generate provenance record</button>
+      </form>
+      <p class="muted smalltext">Registration creates a local record. Network publication is not enabled in this prototype.</p>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <h3>Asset registry</h3>
+        <button class="btn small ghost" id="loadSamples">Load example records</button>
+      </div>
+      <p class="muted smalltext">An inspectable workspace for registered artifacts and their fingerprints.</p>
+      <div class="asset-list" id="assetList">
+        <div class="empty">Your registry is ready.<br>Register an artifact to begin.</div>
+      </div>
+      <div class="actions">
+        <button class="btn small" id="exportButton">Export JSON</button>
+        <button class="btn small" id="clearButton">Clear registry</button>
+      </div>
+    </section>
+
+    <section class="card detail-card">
+      <div class="card-head"><h3>Artifact record</h3><span class="pill gray">INSPECT</span></div>
+      <div id="emptyDetails" class="empty">Select an artifact from the registry to inspect its record.</div>
+      <div id="assetDetails" hidden>
+        <div class="detail"><div class="detail-label">RECORD IDENTIFIER</div><div class="detail-value mono" id="detailId"></div></div>
+        <div class="detail"><div class="detail-label">SHA-256 FINGERPRINT</div><div class="hash" id="detailHash"></div><button class="btn small" id="copyHash" style="margin-top:8px">Copy fingerprint</button></div>
+        <div class="detail"><div class="detail-label">CATEGORY</div><div class="detail-value" id="detailType"></div></div>
+        <div class="detail"><div class="detail-label">REGISTERED</div><div class="detail-value" id="detailCreated"></div></div>
+        <div class="detail"><div class="detail-label">DESCRIPTION</div><div class="detail-value muted" id="detailDescription"></div></div>
+        <div class="detail"><div class="detail-label">PUBLICATION STATUS</div><span class="pill purple">LOCAL RECORD</span></div>
+        <h3 style="margin-top:19px">Record history</h3>
+        <div class="timeline" id="timeline"></div>
+        <button class="btn full" id="verifySelected">Verify artifact integrity</button>
+      </div>
+      <div class="notice"><strong>Publication boundary</strong><br>The product is designed for verifiable provenance. This prototype does not publish on-chain records or establish a public timestamp.</div>
+    </section>
+  </div>
+
+  <div class="features">
+    <div class="feature"><div class="symbol">⌕</div><strong>Traceability</strong><p>Structured artifact records.</p></div>
+    <div class="feature"><div class="symbol">⬡</div><strong>Integrity</strong><p>Cryptographic fingerprints.</p></div>
+    <div class="feature"><div class="symbol">⌑</div><strong>Verification</strong><p>Compare file fingerprints.</p></div>
+    <div class="feature"><div class="symbol">⌘</div><strong>Extensible design</strong><p>Prepared for future adapters.</p></div>
+  </div>
+</section>
+
+<section class="view" id="view-register">
+  <div class="subhero"><div class="eyebrow">WORKSPACE / 01</div><h2>Artifact registration</h2><p>Establish a structured record and calculate a fingerprint for the exact bytes of a selected file.</p></div>
+  <div class="workflow">
+    <div class="step"><div class="num">STEP 01</div><strong>Identify</strong><p>Provide a name, category and contextual metadata.</p></div>
+    <div class="step"><div class="num">STEP 02</div><strong>Fingerprint</strong><p>Calculate a SHA-256 hash locally.</p></div>
+    <div class="step"><div class="num">STEP 03</div><strong>Record</strong><p>Generate an identifier and a local event history.</p></div>
+    <div class="step"><div class="num">STEP 04</div><strong>Prepare</strong><p>Export structured data for future integration.</p></div>
+  </div>
+  <div class="card" style="margin-top:16px">
+    <h3>Registration workspace</h3>
+    <p class="muted smalltext">Use the registration panel on the overview page to create an artifact record.</p>
+    <button class="btn primary" data-go="overview">Open workspace ↗</button>
+  </div>
+</section>
+
+<section class="view" id="view-records">
+  <div class="subhero"><div class="eyebrow">REGISTRY / 02</div><h2>Asset registry</h2><p>Review locally registered artifacts, select a record and inspect its fingerprint and history.</p></div>
+  <div class="card">
+    <div class="card-head"><h3>Registered artifacts</h3><span class="pill blue" id="recordCount">0 RECORDS</span></div>
+    <div class="asset-list" id="recordsList"><div class="empty">No records yet.</div></div>
+    <div class="actions"><button class="btn" data-go="overview">Register artifact</button><button class="btn" id="exportButton2">Export manifest JSON</button></div>
+  </div>
+</section>
+
+<section class="view" id="view-verify">
+  <div class="subhero"><div class="eyebrow">INTEGRITY / 03</div><h2>Artifact verification</h2><p>Compare a selected file against the SHA-256 fingerprint stored in an artifact record.</p></div>
+  <div class="card" style="max-width:760px">
+    <h3>Fingerprint comparison</h3>
+    <p class="muted smalltext">Choose a registered record and the file to compare. File processing happens locally in your browser.</p>
+    <label class="label" for="verifyAsset">Registered artifact</label>
+    <select id="verifyAsset"></select>
+    <label class="label" for="verifyFile">File to verify</label>
+    <input id="verifyFile" type="file">
+    <button class="btn primary full" id="runVerify">Calculate and compare</button>
+    <div id="verificationResult" class="result" aria-live="polite"></div>
+    <div class="notice"><strong>Interpretation</strong><br>A matching fingerprint indicates that the file's bytes match the recorded hash. It does not independently prove who created the artifact or when it existed. That requires a trustworthy record and, for public verification, a suitable external anchoring mechanism.</div>
+  </div>
+</section>
+
+<section class="view" id="view-architecture">
+  <div class="subhero"><div class="eyebrow">SYSTEM DESIGN / 04</div><h2>Proposed architecture</h2><p>Separate artifact handling from the integrity record and its future verification layer.</p></div>
+  <div class="workflow">
+    <div class="step"><div class="num">01 / INPUT</div><strong>Digital artifact</strong><p>A file, dataset, research output, software release or media object.</p></div>
+    <div class="step"><div class="num">02 / FINGERPRINT</div><strong>SHA-256</strong><p>Calculate a deterministic cryptographic fingerprint from file bytes.</p></div>
+    <div class="step"><div class="num">03 / RECORD</div><strong>Provenance metadata</strong><p>Associate an identifier, hash, context and event history.</p></div>
+    <div class="step"><div class="num">04 / FUTURE LAYER</div><strong>External anchoring</strong><p>Publish a commitment through a defined network adapter and verify against it.</p></div>
+  </div>
+  <div class="section-grid" style="grid-template-columns:repeat(2,minmax(0,1fr))">
+    <div class="card">
+      <h3>Current product capabilities</h3>
+      <div class="detail"><div class="detail-value">✓ Local SHA-256 file fingerprinting</div></div>
+      <div class="detail"><div class="detail-value">✓ Artifact metadata and identifiers</div></div>
+      <div class="detail"><div class="detail-value">✓ Session-based event history</div></div>
+      <div class="detail"><div class="detail-value">✓ File integrity comparison</div></div>
+      <div class="detail"><div class="detail-value">✓ JSON manifest export</div></div>
+    </div>
+    <div class="card">
+      <h3>Integration boundary</h3>
+      <div class="detail"><div class="detail-value">○ Solana program and record schema</div></div>
+      <div class="detail"><div class="detail-value">○ Wallet signing and transaction submission</div></div>
+      <div class="detail"><div class="detail-value">○ Public timestamp and commitment lookup</div></div>
+      <div class="detail"><div class="detail-value">○ Persistent registry and independent verification</div></div>
+      <div class="notice">These are future integration requirements, not active features. No wallet is requested and no network transaction is sent.</div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:16px">
+    <h3>Project repository</h3>
+    <p class="muted smalltext">Source code and project development.</p>
+    <a class="btn" href="https://github.com/axaxayacatl/provenance-machine" target="_blank" rel="noopener noreferrer">Open Provenance Machine on GitHub ↗</a>
+  </div>
+</section>
+
+<footer>PROVENANCE MACHINE · PRODUCT PROTOTYPE · 2026</footer>
+</main>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+"use strict";
+const $ = id => document.getElementById(id);
+let assets = [];
+let selectedId = null;
+let pendingFile = null;
+let toastTimer;
+
+const esc = s => String(s ?? "").replace(/[&<>"']/g,c=>({
+  "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+})[c]);
+
+function notify(message){
+  $("toast").textContent=message;
+  $("toast").classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>$("toast").classList.remove("show"),2800);
+}
+function formatDate(value){
+  return new Date(value).toLocaleString(undefined,{
+    year:"numeric",month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"
+  });
+}
+function makeId(){
+  return "pm_"+crypto.randomUUID().replaceAll("-","").slice(0,20);
+}
+async function hashBytes(bytes){
+  if(!crypto.subtle)throw new Error("Secure browser cryptography is unavailable. Use HTTPS or localhost.");
+  const digest=await crypto.subtle.digest("SHA-256",bytes);
+  return Array.from(new Uint8Array(digest),b=>b.toString(16).padStart(2,"0")).join("");
+}
+async function hashFile(file){
+  return hashBytes(await file.arrayBuffer());
+}
+function sizeText(n){
+  if(n<1024)return n+" B";
+  if(n<1048576)return (n/1024).toFixed(1)+" KB";
+  return (n/1048576).toFixed(2)+" MB";
+}
+function addEvent(asset,title,description,future=false){
+  asset.events.push({title,description,time:new Date().toISOString(),future});
+}
+function iconFor(type){
+  if(/dataset|research/i.test(type))return "⌗";
+  if(/software/i.test(type))return "⌘";
+  if(/media/i.test(type))return "▧";
+  if(/physical/i.test(type))return "⬡";
+  return "▤";
+}
+function selectFile(file){
+  pendingFile=file||null;
+  $("chosenFile").textContent=file?file.name+" · "+sizeText(file.size):"No file selected";
+  $("dropTitle").textContent=file?"Artifact ready for fingerprinting":"Select or drop a file";
+  if(file&&!$("assetName").value.trim())$("assetName").value=file.name.replace(/\.[^.]+$/,"");
+}
+function selectAsset(id){
+  const a=assets.find(x=>x.id===id);
+  if(!a)return;
+  selectedId=id;
+  renderLists();
+  $("emptyDetails").hidden=true;
+  $("assetDetails").hidden=false;
+  $("detailId").textContent=a.id;
+  $("detailHash").textContent=a.hash;
+  $("detailType").textContent=a.type;
+  $("detailCreated").textContent=formatDate(a.created);
+  $("detailDescription").textContent=a.description||"No description supplied.";
+  $("timeline").innerHTML=a.events.map(e=>`
+    <div class="event ${e.future?"future":""}">
+      <strong>${esc(e.title)}</strong>
+      <p>${esc(formatDate(e.time))}<br>${esc(e.description)}</p>
+    </div>`).join("");
+  $("verifySelected").onclick=()=>{
+    $("verifyAsset").value=a.id;
+    showView("verify");
+  };
+}
+function cardHTML(a){
+  return `<div class="asset ${a.id===selectedId?"selected":""}" data-id="${esc(a.id)}" role="button" tabindex="0">
+    <div class="asset-icon">${iconFor(a.type)}</div>
+    <div class="asset-info">
+      <strong>${esc(a.name)}</strong>
+      <small>${esc(a.type)}${a.fileSize!==null?" · "+sizeText(a.fileSize):""}</small>
+      <small>${esc(formatDate(a.created))}</small>
+    </div><span class="asset-arrow">›</span>
+  </div>`;
+}
+function renderLists(){
+  const html=assets.map(cardHTML).join("");
+  $("assetList").innerHTML=html||'<div class="empty">Your registry is ready.<br>Register an artifact to begin.</div>';
+  $("recordsList").innerHTML=html||'<div class="empty">No records yet.</div>';
+  $("recordCount").textContent=assets.length+" RECORD"+(assets.length===1?"":"S");
+  $("verifyAsset").innerHTML=assets.map(a=>`<option value="${esc(a.id)}">${esc(a.name)}</option>`).join("");
+  document.querySelectorAll("[data-id]").forEach(el=>{
+    const choose=()=>selectAsset(el.dataset.id);
+    el.addEventListener("click",choose);
+    el.addEventListener("keydown",e=>{
+      if(e.key==="Enter"||e.key===" "){e.preventDefault();choose();}
+    });
+  });
+}
+function showView(name){
+  document.querySelectorAll(".view").forEach(v=>v.classList.toggle("active",v.id==="view-"+name));
+  document.querySelectorAll(".nav").forEach(b=>b.classList.toggle("active",b.dataset.view===name));
+  window.scrollTo({top:0,behavior:"smooth"});
+  if(name==="records")renderLists();
+}
+document.querySelectorAll(".nav").forEach(b=>b.addEventListener("click",()=>showView(b.dataset.view)));
+document.querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",()=>showView(b.dataset.go)));
+
+$("fileInput").addEventListener("change",e=>selectFile(e.target.files[0]));
+["dragover","dragenter"].forEach(type=>$("dropzone").addEventListener(type,e=>{
+  e.preventDefault();$("dropzone").classList.add("drag");
+}));
+["dragleave","drop"].forEach(type=>$("dropzone").addEventListener(type,e=>{
+  e.preventDefault();$("dropzone").classList.remove("drag");
+}));
+$("dropzone").addEventListener("drop",e=>{
+  const file=e.dataTransfer.files[0];if(file)selectFile(file);
+});
+
+$("assetForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const name=$("assetName").value.trim();
+  if(!name)return notify("Enter an artifact name.");
+  const button=$("createButton");
+  button.disabled=true;button.textContent="Calculating fingerprint…";
+  try{
+    const created=new Date().toISOString();
+    const type=$("assetType").value;
+    const description=$("assetDescription").value.trim();
+    const hash=pendingFile
+      ?await hashFile(pendingFile)
+      :await hashBytes(new TextEncoder().encode(JSON.stringify({name,type,description,created})));
+    const a={
+      id:makeId(),name,type,description,hash,created,
+      fileName:pendingFile?.name||null,fileSize:pendingFile?.size??null,
+      sample:false,events:[]
+    };
+    addEvent(a,"Artifact registered","Local provenance record created");
+    addEvent(a,"SHA-256 calculated",pendingFile
+      ?"Fingerprint calculated from the selected file bytes"
+      :"Fingerprint calculated from the initial metadata payload");
+    addEvent(a,"External publication pending","No external record was published",true);
+    assets.unshift(a);
+    renderLists();selectAsset(a.id);
+    $("assetForm").reset();selectFile(null);
+    showView("overview");
+    notify("Artifact registered. Fingerprint generated locally.");
+  }catch(err){notify(err.message||"Could not register artifact.");}
+  finally{button.disabled=false;button.textContent="Generate provenance record";}
+});
+
+$("loadSamples").addEventListener("click",()=>{
+  if(assets.some(a=>a.sample))return notify("Example records are already loaded.");
+  const examples=[
+    ["Research Dataset 001","Dataset","Illustrative research dataset record."],
+    ["Software Release 0.1","Software release","Illustrative release manifest record."],
+    ["Digital Media Archive","Media asset","Illustrative digital media record."]
+  ];
+  examples.forEach(([name,type,description])=>{
+    const created=new Date().toISOString();
+    const a={id:makeId(),name,type,description,created,hash:"",fileName:null,fileSize:null,sample:true,events:[]};
+    assets.push(a);
+    addEvent(a,"Artifact record created","Example record for interface exploration",true);
+    addEvent(a,"External publication pending","No external record was published",true);
+    a.hash="Example fingerprint — register an actual file to calculate SHA-256";
+  });
+  renderLists();selectAsset(assets[0].id);
+  notify("Example records loaded. Fingerprints are illustrative.");
+});
+
+$("copyHash").addEventListener("click",async()=>{
+  const a=assets.find(x=>x.id===selectedId);if(!a)return;
+  try{await navigator.clipboard.writeText(a.hash);notify("Fingerprint copied.");}
+  catch{notify("Clipboard unavailable. Copy the fingerprint manually.");}
+});
+
+function exportManifest(){
+  if(!assets.length)return notify("Register an artifact before exporting.");
+  const payload={
+    product:"Provenance Machine",
+    formatVersion:1,
+    exportedAt:new Date().toISOString(),
+    network:{adapter:"solana",connected:false,transactionSubmitted:false},
+    disclaimer:"Product prototype export. Local records are not externally anchored. Example fingerprints are illustrative.",
+    assets
+  };
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url;a.download="provenance-machine-manifest.json";a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+  notify("Manifest exported.");
+}
+$("exportButton").addEventListener("click",exportManifest);
+$("exportButton2").addEventListener("click",exportManifest);
+
+$("clearButton").addEventListener("click",()=>{
+  if(assets.length&&!confirm("Clear all locally registered records?"))return;
+  assets=[];selectedId=null;
+  $("emptyDetails").hidden=false;$("assetDetails").hidden=true;
+  renderLists();notify("Registry cleared.");
+});
+
+$("runVerify").addEventListener("click",async()=>{
+  const a=assets.find(x=>x.id===$("verifyAsset").value);
+  const file=$("verifyFile").files[0];
+  const result=$("verificationResult");
+  result.className="result show";
+  if(!a||!file){
+    result.classList.add("fail");result.textContent="Select an artifact and a file to compare.";return;
+  }
+  const button=$("runVerify");button.disabled=true;button.textContent="Calculating…";
+  try{
+    const actual=await hashFile(file);
+    const match=!a.sample&&actual===a.hash;
+    result.className="result show "+(match?"pass":"fail");
+    const heading=document.createElement("strong");
+    heading.textContent=match?"Fingerprint match":"Fingerprint mismatch";
+    const message=document.createElement("p");
+    message.textContent=match
+      ?"The selected file has the same SHA-256 fingerprint as the registered record."
+      :a.sample
+        ?"This is an example record. Register the actual file to calculate a comparable fingerprint."
+        :"The selected file's bytes differ from the fingerprint stored in this record.";
+    const calculated=document.createElement("div");
+    calculated.className="hash";calculated.textContent="Calculated SHA-256: "+actual;
+    result.replaceChildren(heading,message,calculated);
+    if(match){
+      addEvent(a,"Integrity verification passed","Selected file matched the registered SHA-256 fingerprint");
+      if(selectedId===a.id)selectAsset(a.id);
+    }
+  }catch(err){
+    result.className="result show fail";result.textContent=err.message||"Verification failed.";
+  }finally{button.disabled=false;button.textContent="Calculate and compare";}
+});
+
+// The product prototype deliberately does not include a Solana SDK,
+// wallet connection, RPC endpoint, private key or transaction submission.
+renderLists();
+})();
+</script>
+</body>
+</html>
